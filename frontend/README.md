@@ -25,3 +25,7 @@ After that last command, the application should automatically open on your brows
 **Enjoy playing _Rock Paper Scissors_!**
 
 ## Executing the Test Suites
+On the repo's root directory:
+- `npx hardhat test`
+
+This test suite will run tests over the `RPS.sol` Smart Contract. You can check each test out going to `test/RPS.js`.
