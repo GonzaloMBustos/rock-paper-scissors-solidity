@@ -29,3 +29,24 @@ On the repo's root directory:
 - `npx hardhat test`
 
 This test suite will run tests over the `RPS.sol` Smart Contract. You can check each test out going to `test/RPS.js`.
+
+## HOW TO PLAY ROCK, PAPER, SCISSORS
+Once your app is running, start by _Connecting your Wallet_ using the provided yellow button.
+
+After that, you'll see a greeting with your selected ethereum address and an input prompt where you can challenge other players using their public addresses. Bare in mind that this version of the app only allows two players at once.
+
+Once you've challenged a player, you'll have to WAIT until the other player has accepted or rejected your challenge.
+If you're the player being challenged, then you'll be prompted to Accept or Reject the challenge.
+
+Once the challenge has been accepted, both players will be prompted to choose Rock, Paper or Scissors, and also place a bet.
+After choosing one of the options and submitting it, you'll have to wait for the other player to submit their choice.
+
+*DO NOT LEAVE OR RELOAD THE PAGE SINCE THERE IS NO DATABASE OR GLOBAL STORAGE KEEPING YOUR INFORMATION*
+
+When both players have submitted their choices, both will be able to Reveal their choices to the public, and therefore, to their opponent.
+
+Once both players have revealed their choices, the winner will be announced, and both players will get to claim their respective prizes.
+
+After declaring the winner, the game has finished and the players will have to refresh the page in order to reset the initial state to avoid caching.
+
+**Happy playing _Rock Paper Scissors_ and good luck!**
