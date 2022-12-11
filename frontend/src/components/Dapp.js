@@ -30,6 +30,7 @@ export class Dapp extends React.Component {
       challengedPlayer: false,
       choice: undefined,
       revealedChoices: [],
+      bid: 0,
     };
 
     this.state = this.initialState;
@@ -123,23 +124,31 @@ export class Dapp extends React.Component {
             )}
 
             {!!this.state.challenger && !this.state.challengedPlayer && (
-              <div style={{ display: "flex", justifyContent: "space-around" }}>
-                Challenged by {this.state.challenger}
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={this._acceptChallenge}
+              <>
+                <p>
+                  If you reject the challenge, you will need to refresh the page
+                  after submission.
+                </p>
+                <div
+                  style={{ display: "flex", justifyContent: "space-around" }}
                 >
-                  Accept Challenge
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={this._rejectChallenge}
-                >
-                  Reject Challenge
-                </button>
-              </div>
+                  Challenged by {this.state.challenger}
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={this._acceptChallenge}
+                  >
+                    Accept Challenge
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={this._rejectChallenge}
+                  >
+                    Reject Challenge
+                  </button>
+                </div>
+              </>
             )}
             {this.state.gameStarted &&
               (this.state.stage === 0 || this.state.stage === 1) && (
@@ -149,6 +158,20 @@ export class Dapp extends React.Component {
                     Once you have submitted your answer, you'll have to wait
                     until your opponent has submitted theirs. Be patient!
                   </p>
+                  <div className="input-group mb-3">
+                    <input
+                      type="number"
+                      className="form-control"
+                      id="challengePlayer"
+                      placeholder="Insert your bid in ether!"
+                      onChange={(e) => {
+                        this.setState({
+                          bid: e.target.value,
+                        });
+                      }}
+                      disabled={!!this.state.choice}
+                    />
+                  </div>
                   <div
                     style={{ display: "flex", justifyContent: "space-around" }}
                   >
@@ -367,11 +390,16 @@ export class Dapp extends React.Component {
   }
 
   _commitChoice = async (choice) => {
+    // 1 is the minimum bet set on the Smart Contract
+    const bet =
+      !!this.state.bid && this.state.bid > 1
+        ? Number.parseInt(this.state.bid)
+        : 1;
     const hashChoice = await this._rps.hashPacked(
       this.state.selectedAddress,
       choice
     );
-    await this._rps.commit(hashChoice, { value: 2 });
+    await this._rps.commit(hashChoice, { value: bet });
     this.setState({ choice });
     this._pollReveals();
   };
@@ -442,6 +470,7 @@ export class Dapp extends React.Component {
 
   _rejectChallenge = async () => {
     await this._rps.rejectChallenge();
+    // This is not enough because it is not waiting for the txn to be mined, so the user will have to wait and refresh the page.
     this.setState({ challenger: undefined });
   };
 
