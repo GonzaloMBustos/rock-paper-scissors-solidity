@@ -90,7 +90,7 @@ contract RPS is AccessControl {
 		else stage = Stage.FirstReveal;
 	}
 
-	function reveal(Choice choice) public {
+	function reveal(Choice choice) public onlyChallengedPlayers(msg.sender){
 		// Only run during reveal stages
 		require(stage == Stage.FirstReveal || stage == Stage.SecondReveal, "not at reveal stage");
 		// Only accept valid choices
@@ -144,23 +144,19 @@ contract RPS is AccessControl {
 		}
 		else if (players[0].choice == Choice.None) {
 			player1Payout = winningAmount;
-			emit DeclareWinner(players[1].playerAddress, winningAmount);
 		}
 		else if (players[1].choice == Choice.None) {
 			player0Payout = winningAmount;
-			emit DeclareWinner(players[0].playerAddress, winningAmount);
 		}
 		else if (players[0].choice == Choice.Rock) {
 			assert(players[1].choice == Choice.Paper || players[1].choice == Choice.Scissors);
 			if (players[1].choice == Choice.Paper) {
 				// Rock loses to paper
 				player1Payout = winningAmount;
-				emit DeclareWinner(players[1].playerAddress, winningAmount);
 			}
 			else if (players[1].choice == Choice.Scissors) {
 				// Rock beats scissors
 				player0Payout = winningAmount;
-				emit DeclareWinner(players[0].playerAddress, winningAmount);
 			}
 		}
 		else if (players[0].choice == Choice.Paper) {
@@ -168,12 +164,10 @@ contract RPS is AccessControl {
 			if(players[1].choice == Choice.Rock) {
 				// Paper beats rock
 				player0Payout = winningAmount;
-				emit DeclareWinner(players[0].playerAddress, winningAmount);
 			}
 			else if(players[1].choice == Choice.Scissors) {
 				// Paper loses to scissors
 				player1Payout = winningAmount;
-				emit DeclareWinner(players[1].playerAddress, winningAmount);
 			}
 		}
 		else if(players[0].choice == Choice.Scissors) {
@@ -181,21 +175,22 @@ contract RPS is AccessControl {
 			if(players[1].choice == Choice.Rock) {
 				// Scissors lose to rock
 				player1Payout = winningAmount;
-				emit DeclareWinner(players[1].playerAddress, winningAmount);
 			}
 			else if(players[1].choice == Choice.Paper) {
 				// Scissors beats paper
 				player0Payout = winningAmount;
-				emit DeclareWinner(players[0].playerAddress, winningAmount);
 			}
 		}
 
 		if (player0Payout > player1Payout) {
 			(bool success,) = players[0].playerAddress.call{value: player0Payout}("");
 			require(success, "couldnt pay");
+			emit DeclareWinner(players[0].playerAddress, player0Payout);
+
 		} else if (player1Payout > player0Payout) {
 			(bool success,) = players[1].playerAddress.call{value: player1Payout}("");
 			require(success, "couldnt pay");
+			emit DeclareWinner(players[1].playerAddress, player1Payout);
 		}
 
 		delete challengedPlayers[players[0].playerAddress];
