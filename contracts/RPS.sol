@@ -4,7 +4,9 @@
 // It will be used by the Solidity compiler to validate its version.
 pragma solidity ^0.8.9;
 
-contract RPS {
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+
+contract RPS is ReentrancyGuard {
 
 	modifier onlyChallengedPlayers(address player) {
 		require(challengedPlayers[player] != address(0));
@@ -118,7 +120,7 @@ contract RPS {
 		else stage = Stage.DeclareWinner;
 	}
 
-	function declareWinner() public {
+	function declareWinner() public nonReentrant {
 		// To declareWinner we need:
 		// a) to be in declareWinner stage OR
 		// b) still in the second reveal stage but past the deadline
