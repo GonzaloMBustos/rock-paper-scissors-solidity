@@ -4,9 +4,7 @@
 // It will be used by the Solidity compiler to validate its version.
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
-
-contract RPS is AccessControl {
+contract RPS {
 
 	modifier onlyChallengedPlayers(address player) {
 		require(challengedPlayers[player] != address(0));
@@ -182,6 +180,8 @@ contract RPS is AccessControl {
 			}
 		}
 
+		// Prevent reentrancy by resetting stage to initial
+		stage = Stage.FirstCommit;
 		if (player0Payout > player1Payout) {
 			(bool success,) = players[0].playerAddress.call{value: player0Payout}("");
 			require(success, "couldnt pay");
@@ -195,7 +195,6 @@ contract RPS is AccessControl {
 
 		delete challengedPlayers[players[0].playerAddress];
 		delete challengedPlayers[players[1].playerAddress];
-		stage = Stage.FirstCommit;
 	}
 
 	function hashPacked(address _addr, Choice _choice) external pure returns(bytes32 h) {
